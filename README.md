@@ -6,7 +6,7 @@ This project is a Progressive Web App (PWA) for a Bike Sharing service in the ci
 The initial proposal documents (RAD, SDD, UML diagrams, and presentation) are available in the root of this repository.
 
 ## Team Members
-* [Michele Moxedano] - [@TuoUsernameGitHub]
+* [Michele Moxedano] - [MikM0x]
 * [Christian Coppola] - [@UsernameGitHubCollega]
 
 ## Features
