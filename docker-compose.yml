@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # 1. IL NOSTRO SITO WEB (Flask)
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app  # Questo trucco ci fa aggiornare il sito in tempo reale!
+    depends_on:
+      - db      # Aspetta che il database sia acceso prima di partire
+
+  # 2. IL DATABASE (MongoDB)
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db  # Salva i dati per non perderli se spegniamo Docker
+
+volumes:
+  mongo_data:
