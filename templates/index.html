@@ -2,19 +2,142 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bike Sharing Napoli</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; }
+
+        #app-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            position: relative;
+            background-color: white;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        #mappa { width: 100%; height: 100%; z-index: 1; }
+
+        .top-bar { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 1000; pointer-events: none; }
+        .hamburger, .location-pill { background: white; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; pointer-events: auto; cursor: pointer; }
+        .hamburger { width: 45px; height: 45px; font-size: 20px; color: #333; }
+        .location-pill { padding: 0 15px; height: 45px; font-weight: bold; color: #333; font-size: 15px; }
+        .green-dot { width: 10px; height: 10px; background-color: #28a745; border-radius: 50%; margin-right: 8px; }
+
+        .bottom-sheet { position: absolute; bottom: 70px; left: 0; right: 0; background: white; border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+        .drag-handle { width: 40px; height: 5px; background: #ddd; border-radius: 5px; margin: 0 auto 15px auto; }
+        .greeting { font-size: 22px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .info-text { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .highlight-blue { color: #007bff; font-weight: bold; }
+
+        .btn-scan {
+            width: 100%; background-color: #007bff; color: white; border: none; padding: 16px; border-radius: 12px;
+            font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4); cursor: pointer;
+        }
+
+        .bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; z-index: 1000; border-top: 1px solid #eee; }
+        .nav-item { color: #aaa; font-size: 22px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: #007bff; }
+        .nav-text { font-size: 10px; font-weight: bold; }
+
+        .smart-pin { border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold; border: 2px solid transparent; background-color: white; box-shadow: 0 0 5px rgba(0,0,0,0.5); font-size: 14px; }
+        .pin-blue { border-color: #007bff; color: #007bff; } 
+        .pin-red { border-color: #dc3545; color: #dc3545; }
+
+        /* NUOVO: Stile per il pallino della TUA posizione (un cerchietto blu con bordo bianco) */
+        .mio-punto {
+            background-color: #007bff;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.8);
+        }
+    </style>
 </head>
 <body>
-    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <h1>Benvenuto su Bike Sharing Napoli! 🚲</h1>
-        <p>Se leggi questo messaggio, il tuo server Python Flask funziona alla grande!</p>
+
+    <div id="app-container">
         
-        <h3 style="margin-top: 30px; padding: 15px; background-color: #f0f0f0; border-radius: 8px; display: inline-block;">
-            Stato DB: {{ status }}
-        </h3>
-        
-        <p style="margin-top: 50px;"><i>Progetto di: Mikele e Christian</i></p>
+        <div class="top-bar">
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+            <div class="location-pill"><div class="green-dot"></div> Napoli</div>
+        </div>
+
+        <div id="mappa"></div>
+
+        <div class="bottom-sheet">
+            <div class="drag-handle"></div>
+            <h2 class="greeting">Ciao, Utente! 👋</h2>
+            <p class="info-text">Ci sono <span id="stazioni-vicine" class="highlight-blue">0</span> stazioni attive vicino a te.</p>
+            
+            <input type="file" accept="image/*" capture="environment" id="fotocamera-segreta" style="display: none;">
+            <button class="btn-scan" onclick="document.getElementById('fotocamera-segreta').click();">
+                <i class="fas fa-qrcode"></i> Scansiona per Partire
+            </button>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active"><i class="fas fa-map"></i><span class="nav-text">Mappa</span></div>
+            <div class="nav-item"><i class="fas fa-wallet"></i><span class="nav-text">Wallet</span></div>
+            <div class="nav-item"><i class="fas fa-clock-rotate-left"></i><span class="nav-text">Corse</span></div>
+            <div class="nav-item"><i class="fas fa-user"></i><span class="nav-text">Profilo</span></div>
+        </div>
+
     </div>
+
+    <script>
+        var map = L.map('mappa', { zoomControl: false }).setView([40.8518, 14.2681], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        function creaPinIntelligente(biciDisponibili) {
+            var colorePin = biciDisponibili > 0 ? 'pin-blue' : 'pin-red';
+            return L.divIcon({ className: 'smart-pin ' + colorePin, html: biciDisponibili, iconSize: [30, 30], iconAnchor: [15, 15] });
+        }
+
+        var stazioni = JSON.parse('{{ stazioni | tojson | safe }}');
+        var stazioniAttive = 0;
+
+        stazioni.forEach(function(stazione) {
+            var marker = L.marker([stazione.lat, stazione.lng], {
+                icon: creaPinIntelligente(stazione.bici_disponibili)
+            }).addTo(map);
+            
+           // Quando clicchi il pin, ti porta alla pagina di dettaglio della stazione!
+            marker.on('click', function() {
+                window.location.href = '/stazione/' + stazione.nome;
+            });
+
+            if (stazione.bici_disponibili > 0) stazioniAttive++;
+        });
+
+        document.getElementById('stazioni-vicine').innerText = stazioniAttive;
+
+        /* --- NUOVO: LOGICA DEL GPS --- */
+        // Chiediamo a Leaflet di trovare la posizione e centrare la mappa
+        map.locate({setView: true, maxZoom: 15});
+
+        // Se l'utente accetta e il GPS lo trova, disegniamo il pallino blu!
+        map.on('locationfound', function(e) {
+            L.marker(e.latlng, {
+                icon: L.divIcon({ className: 'mio-punto', iconSize: [16, 16], iconAnchor: [8, 8] })
+            }).addTo(map).bindPopup("Tu sei qui!").openPopup();
+        });
+
+        // Se l'utente rifiuta o non ha il GPS, mostriamo un avviso in console (invisibile all'utente)
+        map.on('locationerror', function(e) {
+            console.log("GPS disattivato o rifiutato: " + e.message);
+        });
+
+    </script>
 </body>
 </html>
