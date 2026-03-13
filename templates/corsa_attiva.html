@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Corsa Attiva</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; height: 100vh; margin: 0; }
+        
+        #app-container { 
+            width: 100%; max-width: 414px; height: 100vh; background-color: white; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative;
+        }
+
+        /* METÀ SUPERIORE: LA MAPPA */
+        #mappa-corsa { flex: 1; width: 100%; z-index: 1; }
+
+        /* L'etichetta "CORSA ATTIVA" in alto al centro */
+        .pill-corsa {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 8px 16px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; z-index: 1000;
+        }
+        .dot-verde { width: 10px; height: 10px; background-color: #28a745; border-radius: 50%; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* METÀ INFERIORE: IL CRUSCOTTO */
+        .cruscotto {
+            background: white; border-radius: 25px 25px 0 0; margin-top: -20px; /* Si sovrappone un po' alla mappa */
+            padding: 30px 20px; z-index: 10; display: flex; flex-direction: column; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+        .drag-handle { width: 40px; height: 5px; background: #ddd; border-radius: 5px; margin: 0 auto 20px auto; }
+
+        /* STATISTICHE (Tempo, Costo, Km) */
+        .stats-grid { display: flex; justify-content: space-between; margin-bottom: 30px; text-align: center; }
+        .stat-box { flex: 1; }
+        .stat-valore { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; }
+
+        /* LO SLIDER SCORRI PER TERMINARE */
+        .slider-bg {
+            position: relative; width: 100%; height: 60px; background: rgba(220, 53, 69, 0.1);
+            border-radius: 30px; display: flex; align-items: center; justify-content: center;
+        }
+        .slider-text { color: #dc3545; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
+        
+        /* Input invisibile che gestisce il tocco */
+        input[type=range] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 3; margin: 0; }
+        
+        /* Il bottone rosso col lucchetto che si muove */
+        .slider-thumb {
+            position: absolute; left: 5px; width: 50px; height: 50px; background: #dc3545;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 20px; z-index: 2; pointer-events: none; box-shadow: 0 4px 10px rgba(220,53,69,0.4);
+        }
+
+        /* Testo Info in basso */
+        .info-restituzione { text-align: center; margin-top: 15px; font-size: 12px; color: #888; display: flex; justify-content: center; align-items: center; gap: 5px; }
+        .icon-info { background: #888; color: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+        /* Il Pin personalizzato per la Mappa */
+        .pin-bici-utente { background-color: #28a745; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(40, 167, 69, 0.8); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <div class="pill-corsa"><div class="dot-verde"></div> CORSA ATTIVA</div>
+        <div id="mappa-corsa"></div>
+
+        <div class="cruscotto">
+            <div class="drag-handle"></div>
+            
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-valore" id="tempo-val">00:00</div>
+                    <div class="stat-label">Tempo</div>
+                </div>
+                <div class="stat-box" style="border-left: 1px solid #eee; border-right: 1px solid #eee;">
+                    <div class="stat-valore" id="costo-val">€0,00</div>
+                    <div class="stat-label">Costo</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-valore">1.2</div>
+                    <div class="stat-label">Km</div>
+                </div>
+            </div>
+
+            <div class="slider-bg" id="slider-container">
+                <div class="slider-text">SCORRI PER TERMINARE</div>
+                <input type="range" id="termina-slider" min="0" max="100" value="0">
+                <div class="slider-thumb" id="slider-thumb"><i class="fas fa-lock"></i></div>
+            </div>
+
+            <div class="info-restituzione">
+                <div class="icon-info"><i class="fas fa-info"></i></div> Riconsegna solo in stazione
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. INIZIALIZZAZIONE MAPPA E PIN
+        var map = L.map('mappa-corsa', { zoomControl: false }).setView([40.8518, 14.2681], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        // Il Pin verde con la bici in mezzo
+        var userIcon = L.divIcon({ className: 'pin-bici-utente', html: '<i class="fas fa-bicycle"></i>', iconSize: [30, 30], iconAnchor: [15, 15] });
+        L.marker([40.8518, 14.2681], {icon: userIcon}).addTo(map);
+
+        // La linea blu finta del navigatore
+        var percorso = [[40.8518, 14.2681], [40.8520, 14.2650], [40.8500, 14.2600]];
+        L.polyline(percorso, {color: '#007bff', weight: 5, opacity: 0.7}).addTo(map);
+
+        // 2. CRONOMETRO E COSTO (Aumentano da soli!)
+        let secondi = 0;
+        setInterval(() => {
+            secondi++;
+            let m = Math.floor(secondi / 60); let s = secondi % 60;
+            document.getElementById('tempo-val').innerText = (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+            document.getElementById('costo-val').innerText = "€" + ((secondi / 60) * 0.25).toFixed(2); // 0.25€ al minuto
+        }, 1000);
+
+        // 3. LOGICA DELLO SLIDER (Scorri per terminare)
+        const slider = document.getElementById('termina-slider');
+        const thumb = document.getElementById('slider-thumb');
+        const container = document.getElementById('slider-container');
+
+        slider.addEventListener('input', function() {
+            // Calcoliamo quanto spazio ha il bottone rosso per muoversi
+            const maxTravel = container.offsetWidth - thumb.offsetWidth - 10; 
+            const moveX = (slider.value / 100) * maxTravel;
+            thumb.style.transform = `translateX(${moveX}px)`; // Muove visivamente il bottone
+
+           // Se arrivi alla fine... andiamo allo scontrino!
+            if(slider.value > 95) {
+                window.location.href = '/fine_corsa'; // <-- CAMBIA QUESTO
+            }
+        });
+
+        // Se l'utente lascia a metà, torna indietro con effetto molla
+        slider.addEventListener('change', function() {
+            if(slider.value < 95) {
+                slider.value = 0;
+                thumb.style.transition = 'transform 0.3s ease'; // Effetto molla
+                thumb.style.transform = `translateX(0px)`;
+                setTimeout(() => { thumb.style.transition = 'none'; }, 300);
+            }
+        });
+    </script>
+</body>
+</html>

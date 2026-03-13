@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Segnala Problema</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Reset base e Font di sistema, coerente con index e dettaglio */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; height: 100vh; margin: 0; }
+        
+        /* IL SIMULATORE DI SMARTPHONE CON FLEXBOX */
+        #app-container { 
+            width: 100%; max-width: 414px; height: 100vh; background-color: white; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative;
+            overflow: hidden; /* Blocca lo scroll globale */
+        }
+
+        /* 1. HEADER (Fisso in alto) */
+        .header-segnalazione {
+            height: 70px; flex-shrink: 0; display: flex; align-items: center; padding: 0 20px;
+            border-bottom: 1px solid #eee; background-color: white; z-index: 10;
+        }
+        .pulsante-indietro { color: #333; font-size: 20px; text-decoration: none; margin-right: 15px; }
+        .titolo-pagina { font-size: 18px; font-weight: bold; color: #111; }
+
+        /* 2. CONTENUTO SCORREVOLE (Flex: 1) */
+        .contenuto-segnalazione { 
+            flex: 1; overflow-y: auto; padding: 20px; 
+            background-color: #fafafa; /* Grigio chiarissimo per staccare */
+        }
+        
+        /* Testo descrittivo */
+        .testo-info { font-size: 14px; color: #555; margin-bottom: 25px; line-height: 1.4; }
+        .bici-code { font-weight: bold; color: #007bff; } /* Codice bici in blu */
+
+        /* Titoli delle sezioni */
+        .titolo-sezione { font-size: 16px; font-weight: bold; color: #333; margin-bottom: 15px; margin-top: 10px; }
+
+        /* GRIGLIA PROBLEMI COMUNI (Useremo un input radio nascosto per la selezione) */
+        .grid-problemi { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        
+        .opzione-problema {
+            background-color: white; border: 1px solid #ddd; border-radius: 15px; padding: 18px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        /* Icone grandi nei riquadri */
+        .opzione-problema i { font-size: 26px; color: #666; margin-bottom: 12px; }
+        .opzione-problema span { font-size: 14px; color: #333; font-weight: 500; }
+
+        /* Effetto hover/click/selezione (stile blu come i pin attivi) */
+        .opzione-problema:active, .opzione-problema.selezionata {
+            border-color: #007bff; background-color: rgba(0, 123, 255, 0.05);
+        }
+        .opzione-problema:active i, .opzione-problema.selezionata i { color: #007bff; }
+        .opzione-problema:active span, .opzione-problema.selezionata span { color: #007bff; font-weight: bold; }
+
+        /* AREA DI TESTO PER DETTAGLI */
+        .area-dettagli {
+            width: 100%; height: 120px; border: 1px solid #ddd; border-radius: 12px;
+            padding: 15px; font-size: 14px; resize: none; /* Blocca il ridimensionamento */
+            outline: none; background-color: white; transition: border-color 0.2s ease;
+        }
+        .area-dettagli:focus { border-color: #007bff; } /* Bordo blu al focus */
+
+        /* 3. BARRA BOTTONE FISSA IN BASSO (flex-shrink: 0) */
+        .barra-bottone { 
+            flex-shrink: 0; padding: 20px; background: white; 
+            border-top: 1px solid #eee; box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+        /* Bottone nero come "Torna alla Home", per staccare dal blu principale */
+        .btn-invia { 
+            width: 100%; background: #111; color: white; padding: 16px; border: none; 
+            border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; 
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-invia:active { background: #333; } /* Effetto pressione */
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <div class="header-segnalazione">
+            <a href="/fine_corsa" class="pulsante-indietro"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="titolo-pagina">Segnala un problema</h1>
+        </div>
+
+        <div class="contenuto-segnalazione">
+            <p class="testo-info">
+                Cosa è andato storto con la tua bici (<span class="bici-code">E-Bike #A92</span>)?<br>
+                Il nostro team di manutenzione la controllerà subito.
+            </p>
+            
+            <h2 class="titolo-sezione">Problemi Comuni</h2>
+            <div class="grid-problemi">
+                <div class="opzione-problema"><i class="fas fa-compact-disc"></i> <span>Freni guasti</span></div>
+                <div class="opzione-problema"><i class="fas fa-link"></i> <span>Catena rotta</span></div>
+                <div class="opzione-problema"><i class="fas fa-dot-circle"></i> <span>Ruota bucata</span></div>
+                <div class="opzione-problema"><i class="fas fa-battery-empty"></i> <span>Batteria scarica</span></div>
+                <div class="opzione-problema"><i class="fas fa-qrcode"></i> <span>QR illeggibile</span></div>
+                <div class="opzione-problema"><i class="fas fa-exclamation-triangle"></i> <span>Altro</span></div>
+            </div>
+
+            <h2 class="titolo-sezione">Dettagli aggiuntivi (opzionale)</h2>
+            <textarea class="area-dettagli" placeholder="Scrivi qui ulteriori dettagli per aiutare il manutentore..."></textarea>
+        </div>
+
+        <div class="barra-bottone">
+            <a href="/termina_corsa" class="btn-invia">
+                <i class="fas fa-paper-plane"></i> Invia Segnalazione
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        const opzioni = document.querySelectorAll('.opzione-problema');
+        opzioni.forEach(opzione => {
+            opzione.addEventListener('click', () => {
+                // Rimuovi la classe 'selezionata' da tutte le altre opzioni
+                opzioni.forEach(o => o.classList.remove('selezionata'));
+                // Aggiungila all'opzione cliccata
+                opzione.classList.add('selezionata');
+            });
+        });
+    </script>
+</body>
+</html>
