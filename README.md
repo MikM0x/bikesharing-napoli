@@ -7,7 +7,7 @@ The initial proposal documents (RAD, SDD, UML diagrams, and presentation) are av
 
 ## Team Members
 * [Michele Moxedano] - [MikM0x]
-* [Christian Coppola] - [@UsernameGitHubCollega]
+* [Christian Coppola] - [ChrisC003-NPLS]
 
 ## Features
 * **Interactive Map:** View available bike stations in Naples using Leaflet.
