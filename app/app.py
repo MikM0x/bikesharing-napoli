@@ -128,10 +128,15 @@ def supporto():
 def corse():
     return render_template('corse.html')
 
-# NUOVA ROTTA: Dashboard Segreta del Manutentore
+# Dashboard Segreta del Manutentore
 @app.route('/manutentore')
 def manutentore():
     return render_template('manutentore.html')
+
+# Dashboard Admin (Gestore da PC)
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
