@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profilo - Napoli Bike</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; height: 100vh; margin: 0; }
+        
+        #app-container { 
+            width: 100%; max-width: 414px; height: 100vh; background-color: #f8f9fa; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative;
+            overflow-y: auto; padding-bottom: 30px;
+        }
+
+        /* HEADER */
+        .header { 
+            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; background: #f8f9fa; z-index: 10;
+        }
+        .btn-icon { color: #333; font-size: 20px; text-decoration: none; width: 30px; }
+        .titolo { font-size: 18px; font-weight: bold; color: #111; }
+        .placeholder-right { width: 30px; } /* Per centrare il titolo */
+
+        /* SEZIONE AVATAR E INFO UTENTE */
+        .user-info-section { text-align: center; padding: 10px 20px 25px 20px; }
+        .avatar { 
+            width: 90px; height: 90px; background-color: #111; color: white; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 35px; 
+            margin: 0 auto 15px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.15); position: relative;
+        }
+        .edit-avatar {
+            position: absolute; bottom: 0; right: 0; background: #007bff; color: white;
+            width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; border: 3px solid #f8f9fa; cursor: pointer;
+        }
+        .user-name { font-size: 22px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .user-email { font-size: 14px; color: #666; }
+
+        /* CONTENITORE DELLE CARD */
+        .cards-container { padding: 0 20px; }
+
+        /* CARD STATISTICHE (Sdoppiata) */
+        .stats-card { 
+            background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eee; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .stats-card:active { transform: scale(0.98); }
+        .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .stats-title { font-size: 14px; font-weight: bold; color: #333; text-transform: uppercase; letter-spacing: 1px; }
+        .stats-link { font-size: 13px; color: #007bff; font-weight: bold; }
+        
+        .stats-grid { display: flex; justify-content: space-between; }
+        .stat-box { flex: 1; text-align: center; }
+        .stat-box:first-child { border-right: 1px solid #eee; }
+        .stat-number { font-size: 28px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .stat-label { font-size: 12px; color: #888; }
+
+        /* CARD ABBONAMENTO ATTIVO */
+        .sub-card { 
+            background: linear-gradient(135deg, #28a745 0%, #208b38 100%); color: white; 
+            border-radius: 16px; padding: 20px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .sub-info-left { display: flex; flex-direction: column; }
+        .sub-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; width: fit-content; margin-bottom: 8px; }
+        .sub-name { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .sub-expire { font-size: 12px; opacity: 0.9; }
+        .sub-icon { font-size: 35px; opacity: 0.8; }
+
+        /* MENU IMPOSTAZIONI A LISTA */
+        .menu-list { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eee; overflow: hidden; margin-bottom: 25px; }
+        .menu-item { 
+            display: flex; align-items: center; padding: 18px 20px; border-bottom: 1px solid #f0f0f0; 
+            cursor: pointer; text-decoration: none; color: #333;
+        }
+        .menu-item:active { background-color: #f9f9f9; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-icon { width: 30px; font-size: 18px; color: #666; }
+        .menu-text { flex: 1; font-size: 15px; font-weight: 500; }
+        .menu-arrow { color: #ccc; font-size: 14px; }
+
+        /* BOTTONE LOGOUT */
+        .btn-logout { 
+            width: 100%; background: white; color: #dc3545; padding: 16px; 
+            border: 1px solid #dc3545; border-radius: 12px; font-size: 16px; font-weight: bold; 
+            cursor: pointer; display: block; text-align: center; text-decoration: none; 
+            transition: all 0.2s;
+        }
+        .btn-logout:active { background: #dc3545; color: white; }
+
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        
+        <div class="header">
+            <a href="/" class="btn-icon"><i class="fas fa-arrow-left"></i></a>
+            <div class="titolo">Il Mio Profilo</div>
+            <div class="placeholder-right"></div>
+        </div>
+
+        <div class="user-info-section">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name">Mario Rossi</div>
+            <div class="user-email">mario.rossi@email.com</div>
+        </div>
+
+        <div class="cards-container">
+            
+            <div class="stats-card" onclick="window.location.href='/corse'">
+                <div class="stats-header">
+                    <div class="stats-title">Le tue attività</div>
+                    <div class="stats-link">Vedi Storico <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 3px;"></i></div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">42</div>
+                        <div class="stat-label">Corse Totali</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">128</div>
+                        <div class="stat-label">Km Percorsi</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sub-card" onclick="window.location.href='/piani'" style="cursor: pointer;">
+                <div class="sub-info-left">
+                    <div class="sub-badge">ATTIVO</div>
+                    <div class="sub-name">Studente Universitari</div>
+                    <div class="sub-expire">Rinnovo il 23 Apr 2026</div>
+                </div>
+                <div class="sub-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+            </div>
+
+            <div class="menu-list">
+                <a href="/modifica_dati" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-user-edit"></i></div>
+                    <div class="menu-text">Modifica Dati</div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="/piani?tab=wallet" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-credit-card"></i></div>
+                    <div class="menu-text">Metodi di Pagamento</div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="/notifiche" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-bell"></i></div>
+                    <div class="menu-text">Notifiche</div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+                <a href="/supporto" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-headset"></i></div>
+                    <div class="menu-text">Aiuto e Supporto</div>
+                    <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+            </div>
+
+            <a href="/login" class="btn-logout"><i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> Esci dall'Account</a>
+
+        </div>
+
+    </div>
+</body>
+</html>

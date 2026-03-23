@@ -102,5 +102,26 @@ def login():
 def registrati():
     return render_template('registrati.html')
 
+# Wallet e Abbonamenti (I Miei Piani)
+@app.route('/piani')
+def piani():
+    return render_template('piani.html')
+
+@app.route('/profilo')
+def profilo():
+    return render_template('profilo.html')
+# --- SOTTO-PAGINE DEL PROFILO ---
+@app.route('/modifica_dati')
+def modifica_dati():
+    return render_template('modifica_dati.html')
+
+@app.route('/notifiche')
+def notifiche():
+    return render_template('notifiche.html')
+
+@app.route('/supporto')
+def supporto():
+    return render_template('supporto.html')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

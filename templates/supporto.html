@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Supporto - Napoli Bike</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f0f2f5; display: flex; justify-content: center; height: 100vh; margin: 0; }
+        
+        #app-container { 
+            width: 100%; max-width: 414px; height: 100vh; background-color: #f8f9fa; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; position: relative;
+        }
+
+        /* HEADER */
+        .header { 
+            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+            background: white; border-bottom: 1px solid #eee; flex-shrink: 0; z-index: 10;
+        }
+        .btn-icon { color: #333; font-size: 20px; text-decoration: none; width: 30px; }
+        .titolo { font-size: 18px; font-weight: bold; color: #111; }
+        .placeholder-right { width: 30px; }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 20px; }
+
+        /* SALUTO INIZIALE */
+        .intro-supporto { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .intro-icon { font-size: 40px; color: #007bff; margin-bottom: 10px; }
+        .intro-title { font-size: 22px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .intro-text { font-size: 14px; color: #666; }
+
+        /* SEZIONE FAQ (A fisarmonica) */
+        .sezione-titolo { font-size: 14px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; margin-top: 10px; }
+        
+        .faq-list { background: white; border-radius: 16px; border: 1px solid #eee; overflow: hidden; margin-bottom: 30px; }
+        .faq-item { border-bottom: 1px solid #f0f0f0; }
+        .faq-item:last-child { border-bottom: none; }
+        
+        .faq-domanda { 
+            padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; 
+            font-size: 15px; font-weight: 600; color: #333; cursor: pointer; background: white; transition: background 0.2s;
+        }
+        .faq-domanda:active { background: #f9f9f9; }
+        .faq-icona { color: #007bff; font-size: 14px; transition: transform 0.3s ease; }
+        
+        /* La risposta nascosta di default */
+        .faq-risposta { 
+            padding: 0 20px; max-height: 0; overflow: hidden; font-size: 14px; color: #666; 
+            line-height: 1.5; background: #fafafa; transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        /* Quando la FAQ è aperta */
+        .faq-item.aperta .faq-risposta { max-height: 200px; padding: 15px 20px; border-top: 1px solid #f0f0f0; }
+        .faq-item.aperta .faq-icona { transform: rotate(180deg); } /* La freccetta si gira in su */
+
+        /* BOTTONI CONTATTO */
+        .contact-box { background: white; padding: 20px; border-radius: 16px; border: 1px solid #eee; text-align: center; }
+        .contact-text { font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 500; }
+        
+        .btn-chat { 
+            width: 100%; background: #111; color: white; padding: 14px; border-radius: 12px; 
+            font-size: 15px; font-weight: bold; cursor: pointer; border: none; margin-bottom: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-email { 
+            width: 100%; background: white; color: #111; padding: 14px; border-radius: 12px; 
+            font-size: 15px; font-weight: bold; cursor: pointer; border: 2px solid #111;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-chat:active, .btn-email:active { transform: translateY(2px); }
+
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        
+        <div class="header">
+            <a href="/profilo" class="btn-icon"><i class="fas fa-arrow-left"></i></a>
+            <div class="titolo">Aiuto e Supporto</div>
+            <div class="placeholder-right"></div>
+        </div>
+
+        <div class="content-area">
+            
+            <div class="intro-supporto">
+                <i class="fas fa-life-ring intro-icon"></i>
+                <div class="intro-title">Ciao Mario!</div>
+                <div class="intro-text">Come possiamo aiutarti oggi?</div>
+            </div>
+
+            <div class="sezione-titolo">Domande Frequenti</div>
+            
+            <div class="faq-list">
+                
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-domanda">
+                        Come si sblocca una bici? <i class="fas fa-chevron-down faq-icona"></i>
+                    </div>
+                    <div class="faq-risposta">
+                        Vai sulla mappa, clicca sul pin della stazione desiderata e seleziona "Prenota". Una volta sul posto, inquadra il QR Code della bici per sbloccarla.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-domanda">
+                        Come termino la corsa? <i class="fas fa-chevron-down faq-icona"></i>
+                    </div>
+                    <div class="faq-risposta">
+                        Assicurati di essere in una stazione autorizzata. Chiudi il lucchetto manuale sulla ruota posteriore e fai scorrere lo slider "Termina Corsa" sull'app.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFaq(this)">
+                    <div class="faq-domanda">
+                        Cosa faccio se la bici è rotta? <i class="fas fa-chevron-down faq-icona"></i>
+                    </div>
+                    <div class="faq-risposta">
+                        Termina immediatamente la corsa e usa il bottone "Segnala Problema" nello scontrino finale. Il nostro team di manutenzione interverrà subito.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sezione-titolo">Non hai trovato risposta?</div>
+            
+            <div class="contact-box">
+                <div class="contact-text">Il nostro team è attivo 24/7</div>
+                <button class="btn-chat" onclick="alert('Apertura chat con l\'operatore...')"><i class="fas fa-comment-dots"></i> Avvia Chat Live</button>
+                <button class="btn-email" onclick="alert('Apertura del tuo client email (supporto@napolibike.it)...')"><i class="fas fa-envelope"></i> Scrivici un'E-mail</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function toggleFaq(elemento) {
+            // Se la FAQ cliccata è già aperta, la chiudiamo
+            if (elemento.classList.contains('aperta')) {
+                elemento.classList.remove('aperta');
+            } else {
+                // Altrimenti, prima chiudiamo tutte le altre (opzionale, ma fa molto pro!)
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('aperta');
+                });
+                // E poi apriamo solo quella cliccata
+                elemento.classList.add('aperta');
+            }
+        }
+    </script>
+</body>
+</html>

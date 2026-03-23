@@ -15,7 +15,7 @@
             padding: 30px 30px 20px 30px; position: relative; overflow-y: auto;
         }
 
-        /* LOGO E TESTO (Leggermente più piccoli per fare spazio) */
+        /* LOGO E TESTO */
         .header-reg { text-align: center; margin-top: 2vh; margin-bottom: 25px; }
         .logo-box { 
             width: 65px; height: 65px; background-color: #007bff; color: white; 
@@ -36,7 +36,7 @@
         .input-wrapper { position: relative; }
         
         .form-input { 
-            width: 100%; padding: 14px 40px; /* Spazio per le icone */
+            width: 100%; padding: 14px 40px;
             border: 1px solid #ddd; border-radius: 12px; font-size: 14px; 
             background-color: #fafafa; outline: none; transition: border-color 0.2s;
         }
@@ -50,7 +50,7 @@
             width: 100%; background: #111; color: white; padding: 16px; 
             border: none; border-radius: 12px; font-size: 16px; font-weight: bold; 
             cursor: pointer; display: block; text-align: center; text-decoration: none; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); letter-spacing: 1px; margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); letter-spacing: 1px; margin-top: 5px;
         }
         .btn-registrati:active { background: #333; box-shadow: none; transform: translateY(2px); }
 
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="margin-bottom: 10px;">
             <label class="form-label">Conferma Password</label>
             <div class="input-wrapper">
                 <i class="fas fa-lock icona-sx"></i>
@@ -113,7 +113,9 @@
             </div>
         </div>
 
-        <a href="/" class="btn-registrati">REGISTRATI</a>
+        <div id="errore-password" style="color: #dc3545; font-size: 13px; text-align: center; font-weight: bold; margin-bottom: 10px; display: none;"></div>
+
+        <button id="btn-submit" class="btn-registrati">REGISTRATI</button>
 
         <div class="footer-reg">
             Hai già un account? <a href="/login">Accedi qui</a>
@@ -122,6 +124,7 @@
     </div>
 
     <script>
+        // Funzione per l'occhio della password
         function setupOcchio(idCampo, idOcchio) {
             const campo = document.getElementById(idCampo);
             const occhio = document.getElementById(idOcchio);
@@ -139,9 +142,32 @@
             });
         }
 
-        // Attiviamo la funzione per entrambi i campi password
         setupOcchio('pass-1', 'occhio-1');
         setupOcchio('pass-2', 'occhio-2');
+
+        // NOVITÀ 3: Il "cervello" che controlla le password
+        const btnSubmit = document.getElementById('btn-submit');
+        const campoPass1 = document.getElementById('pass-1');
+        const campoPass2 = document.getElementById('pass-2');
+        const msgErrore = document.getElementById('errore-password');
+
+        btnSubmit.addEventListener('click', function(event) {
+            // 1. Controlliamo se i campi sono vuoti
+            if (campoPass1.value === '' || campoPass2.value === '') {
+                msgErrore.innerText = "Compila entrambe le password!";
+                msgErrore.style.display = 'block'; // Mostra l'errore in rosso
+            } 
+            // 2. Controlliamo se sono diverse
+            else if (campoPass1.value !== campoPass2.value) {
+                msgErrore.innerText = "Le password non coincidono! Riprova.";
+                msgErrore.style.display = 'block'; // Mostra l'errore in rosso
+            } 
+            // 3. Se sono uguali e piene... vai alla Mappa!
+            else {
+                msgErrore.style.display = 'none'; // Nascondi l'errore
+                window.location.href = '/'; // Vai alla home page (Mappa)
+            }
+        });
     </script>
 </body>
 </html>
