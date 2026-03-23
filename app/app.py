@@ -123,5 +123,15 @@ def notifiche():
 def supporto():
     return render_template('supporto.html')
 
+# La Cronologia delle Corse
+@app.route('/corse')
+def corse():
+    return render_template('corse.html')
+
+# NUOVA ROTTA: Dashboard Segreta del Manutentore
+@app.route('/manutentore')
+def manutentore():
+    return render_template('manutentore.html')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
